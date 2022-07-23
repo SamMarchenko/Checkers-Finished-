@@ -1790,70 +1790,70 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cellViews:
-  - {fileID: 998583381}
-  - {fileID: 42272242}
-  - {fileID: 1397929799}
-  - {fileID: 1979365268}
-  - {fileID: 431203864}
-  - {fileID: 646569685}
-  - {fileID: 1129725893}
-  - {fileID: 415938679}
-  - {fileID: 440621553}
-  - {fileID: 1140489319}
-  - {fileID: 893888101}
-  - {fileID: 1927662067}
-  - {fileID: 853697430}
-  - {fileID: 1249799640}
-  - {fileID: 888787592}
-  - {fileID: 1526037076}
-  - {fileID: 766266556}
-  - {fileID: 811006351}
-  - {fileID: 264110379}
-  - {fileID: 1421475599}
-  - {fileID: 1856510471}
-  - {fileID: 858662008}
-  - {fileID: 2054807067}
-  - {fileID: 66518124}
-  - {fileID: 1276597447}
-  - {fileID: 1921447055}
-  - {fileID: 345504939}
-  - {fileID: 74392866}
-  - {fileID: 764844396}
-  - {fileID: 1441052879}
-  - {fileID: 115280271}
-  - {fileID: 741179414}
-  - {fileID: 1968672196}
-  - {fileID: 704656761}
-  - {fileID: 1459940854}
-  - {fileID: 1563562249}
-  - {fileID: 1822847789}
-  - {fileID: 721337539}
-  - {fileID: 549011336}
-  - {fileID: 1443678617}
-  - {fileID: 1612518078}
-  - {fileID: 1574078359}
-  - {fileID: 2081829537}
-  - {fileID: 1889754771}
-  - {fileID: 96436013}
-  - {fileID: 421464784}
-  - {fileID: 1012336210}
-  - {fileID: 1261027937}
-  - {fileID: 1272962338}
-  - {fileID: 917389717}
-  - {fileID: 155368033}
-  - {fileID: 458112214}
-  - {fileID: 1897425024}
-  - {fileID: 768027357}
-  - {fileID: 2033650053}
-  - {fileID: 1977039873}
   - {fileID: 1792348855}
+  - {fileID: 1272962338}
+  - {fileID: 1612518078}
+  - {fileID: 1968672196}
+  - {fileID: 1276597447}
+  - {fileID: 766266556}
+  - {fileID: 440621553}
+  - {fileID: 998583381}
   - {fileID: 1359679561}
+  - {fileID: 917389717}
+  - {fileID: 1574078359}
+  - {fileID: 704656761}
+  - {fileID: 1921447055}
+  - {fileID: 811006351}
+  - {fileID: 1140489319}
+  - {fileID: 42272242}
   - {fileID: 1042155620}
+  - {fileID: 155368033}
+  - {fileID: 2081829537}
+  - {fileID: 1459940854}
+  - {fileID: 345504939}
+  - {fileID: 264110379}
+  - {fileID: 893888101}
+  - {fileID: 1397929799}
   - {fileID: 1679596706}
+  - {fileID: 458112214}
+  - {fileID: 1889754771}
+  - {fileID: 1563562249}
+  - {fileID: 74392866}
+  - {fileID: 1421475599}
+  - {fileID: 1927662067}
+  - {fileID: 1979365268}
   - {fileID: 1842746617}
+  - {fileID: 1897425024}
+  - {fileID: 96436013}
+  - {fileID: 1822847789}
+  - {fileID: 764844396}
+  - {fileID: 1856510471}
+  - {fileID: 853697430}
+  - {fileID: 431203864}
   - {fileID: 89880703}
+  - {fileID: 768027357}
+  - {fileID: 421464784}
+  - {fileID: 721337539}
+  - {fileID: 1441052879}
+  - {fileID: 858662008}
+  - {fileID: 1249799640}
+  - {fileID: 646569685}
   - {fileID: 1518310623}
+  - {fileID: 2033650053}
+  - {fileID: 1012336210}
+  - {fileID: 549011336}
+  - {fileID: 115280271}
+  - {fileID: 2054807067}
+  - {fileID: 888787592}
+  - {fileID: 1129725893}
   - {fileID: 1822534063}
+  - {fileID: 1977039873}
+  - {fileID: 1261027937}
+  - {fileID: 1443678617}
+  - {fileID: 741179414}
+  - {fileID: 66518124}
+  - {fileID: 1526037076}
+  - {fileID: 415938679}
   _checkerViews:
   - {fileID: 1626175555}
   - {fileID: 169073292}
@@ -1880,6 +1880,9 @@ MonoBehaviour:
   - {fileID: 156016367}
   - {fileID: 1225954581}
   _cellNeighbors: []
+  startMovePosition: {fileID: 0}
+  endMovePosition: {fileID: 0}
+  wantMove: 0
 --- !u!4 &343486471
 Transform:
   m_ObjectHideFlags: 0
@@ -1888,7 +1891,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 343486469}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.9213905, y: -28.5606, z: 37.335365}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -8842,7 +8845,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1792348850}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -35, y: 0, z: -35}
+  m_LocalPosition: {x: -35, y: 0.1, z: -35}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 790612067}
