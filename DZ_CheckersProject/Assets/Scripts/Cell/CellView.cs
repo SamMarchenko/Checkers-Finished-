@@ -9,8 +9,8 @@ namespace Cell
         public delegate void ClickEventHandler(CellView component);
         public event ClickEventHandler OnCellClick;
 
-        [SerializeField] private Dictionary<CellsNeighbours, CellView> myNeighbours = new Dictionary<CellsNeighbours, CellView>();
-        public Dictionary<CellsNeighbours, CellView> MyNeighbours 
+        [SerializeField] private Dictionary<ECellsNeighbours, CellView> myNeighbours = new Dictionary<ECellsNeighbours, CellView>();
+        public Dictionary<ECellsNeighbours, CellView> MyNeighbours 
         {
             get => myNeighbours;
             set => myNeighbours = value;

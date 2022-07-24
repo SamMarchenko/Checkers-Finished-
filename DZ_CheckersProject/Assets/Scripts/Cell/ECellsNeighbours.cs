@@ -1,6 +1,6 @@
 namespace Cell
 {
-    public enum CellsNeighbours
+    public enum ECellsNeighbours
     {
         RightTop,
         LeftTop,

@@ -8,27 +8,38 @@ namespace DefaultNamespace
 {
     public class ClickController : MonoBehaviour
     {
+        private ECellsNeighbours _directionRight = ECellsNeighbours.RightTop;
+        private ECellsNeighbours _directionLeft = ECellsNeighbours.RightBot;
+
         [SerializeField] private CellView[] _cellViews;
+
         [SerializeField] private CheckerView[] _checkerViews;
-        [SerializeField] private List<CellView> _cellNeighbors;
+        //[SerializeField] private List<CellView> _cellNeighbors;
 
         [SerializeField] private Transform _startMovePosition;
         [SerializeField] private Transform _endMovePosition;
         [SerializeField] private bool _wantMove;
+        [SerializeField] private bool _isCanAttack;
 
         [SerializeField]
-        private Dictionary<CellsNeighbours, CellView> CellsAndNeighbours = new Dictionary<CellsNeighbours, CellView>();
+        private Dictionary<ECellsNeighbours, CellView> CellsAndNeighbours = new Dictionary<ECellsNeighbours, CellView>();
 
         [SerializeField] private Dictionary<CheckerView, CellView> _pairCheckerCell;
+
+        private CellView _startCell;
+        private CellView _finishedCell;
+
+        private CheckerView _clickedChecker;
 
 
         private void Start()
         {
             FindAllNeighbours();
+
             foreach (var cell in _cellViews)
             {
                 cell.OnCellClick += PrintDictionary;
-                cell.OnCellClick += FindMovingСoordinates;
+                cell.OnCellClick += OnCellClick;
             }
 
             foreach (var checker in _checkerViews)
@@ -37,53 +48,7 @@ namespace DefaultNamespace
             }
         }
 
-        //todo: пока не актуален
-        private void GetNeighborsOld(CellView cellView)
-        {
-            _cellNeighbors.Clear();
-            Debug.Log($"Clicked cell = {cellView.name}");
-            var clickedCell = cellView.gameObject.transform;
-
-            var rightTopNeighbor = clickedCell.position;
-            var leftTopNeighbor = clickedCell.position;
-            var rightBotNeighbor = clickedCell.position;
-            var leftBotNeighbor = clickedCell.position;
-
-            rightTopNeighbor += new Vector3(10f, 0, 10f);
-            leftTopNeighbor += new Vector3(-10f, 0, 10f);
-            rightBotNeighbor += new Vector3(10f, 0, -10f);
-            leftBotNeighbor += new Vector3(-10f, 0, -10f);
-
-
-            foreach (var cell in _cellViews)
-            {
-                if (cell.transform.position == rightTopNeighbor)
-                {
-                    _cellNeighbors.Add(cell);
-                    Debug.Log($"Right top neighbor = {cell.name}");
-                }
-
-                if (cell.transform.position == leftTopNeighbor)
-                {
-                    _cellNeighbors.Add(cell);
-                    Debug.Log($"Left top neighbor = {cell.name}");
-                }
-
-                if (cell.transform.position == rightBotNeighbor)
-                {
-                    _cellNeighbors.Add(cell);
-                    Debug.Log($"Right bot neighbor = {cell.name}");
-                }
-
-                if (cell.transform.position == leftBotNeighbor)
-                {
-                    _cellNeighbors.Add(cell);
-                    Debug.Log($"Left bot neighbor = {cell.name}");
-                }
-            }
-        }
-
-        private void FindMovingСoordinates(CellView cellView)
+        private void OnCellClick(CellView clickedCell)
         {
             if (!_wantMove)
             {
@@ -91,38 +56,150 @@ namespace DefaultNamespace
                 _endMovePosition = null;
                 return;
             }
+            foreach (var clickedCellMyNeighbour in clickedCell.MyNeighbours)
+            {
+                if (_startCell != clickedCellMyNeighbour.Value) continue;
+                if (!IsFreeCell(clickedCell, out var pofig)) break;
+                _endMovePosition = clickedCell.transform;
+                Move(_clickedChecker);
+            }
+            
+            
+            
+            
+        }
+
+        private void isValideCellForAttack(CellView clickedCell)
+        {
+            //todo: нужно написать метод определения валидной для атаки клетки
+        }
+
+        private void Move(CheckerView checkerView)
+        {
+            //todo: нужна корутина движения
 
             _wantMove = false;
-            foreach (var cell in _cellNeighbors)
-            {
-                if (cellView == cell)
-                {
-                    _endMovePosition = cell.transform;
+            // if (!IsFreeCell(clickedCell, out var pofig))
+            // {
+            //     _startMovePosition = null;
+            //     return;
+            // }
+            
+            
+            _startMovePosition = null;
+        }
+        
+        
+        
 
-                    return;
+        private bool IsFreeCell(CellView clickedCell, out CheckerView checkerView)
+        {
+            var (xCell, zCell) = GetPositionToInt(clickedCell.transform.position);
+            foreach (var checker in _checkerViews)
+            {
+                var (xChecker, zChecker) = GetPositionToInt(checker.transform.position);
+                if (xCell == xChecker && zCell == zChecker)
+                {
+                    Debug.Log($"The cell {clickedCell.name} is occupied by checker {checker.name}");
+                    checkerView = checker;
+                    return false;
                 }
             }
 
-            _startMovePosition = null;
+            checkerView = null;
+            return true;
         }
+
+        // private bool IsTryToEatEnemy(CellView clickedCell)
+        // {
+        //     foreach (var neighbourForStartCell in _startCell.MyNeighbours)
+        //     {
+        //         if (clickedCell == neighbourForStartCell.Value)
+        //         {
+        //             return false;
+        //         }
+        //     }
+        //
+        //     // if (expr)
+        //     // {
+        //     //     
+        //     // }
+        // }
 
         private void OnChecker(CheckerView checkerView)
         {
             _wantMove = true;
-            Debug.Log("Test");
-            var xChecker = (int) checkerView.transform.position.x;
-            var zChecker = (int) checkerView.transform.position.z;
+            _clickedChecker = checkerView;
+            
+            var (xChecker, zChecker) = GetPositionToInt(checkerView.transform.position);
 
             foreach (var cell in _cellViews)
             {
-                var xCell = (int) cell.transform.position.x;
-                var zCell = (int) cell.transform.position.z;
+                var (xCell, zCell) = GetPositionToInt(cell.transform.position);
 
                 if (xChecker == xCell && zChecker == zCell)
                 {
                     _startMovePosition = cell.transform;
+                    _startCell = cell;
+                    GetEnemiesInNeighbourCells(_startCell);
                     _endMovePosition = null;
-                    Debug.Log("In if");
+                }
+            }
+        }
+
+        private void GetEnemiesInNeighbourCells(CellView startCell)
+        {
+            CellView LeftNeighbour = null;
+            CellView RightNeighbour = null;
+            
+                if (startCell.MyNeighbours.ContainsKey(_directionLeft))
+                {
+                    LeftNeighbour = startCell.MyNeighbours[_directionLeft];
+                }
+
+                if (startCell.MyNeighbours.ContainsKey(_directionRight))
+                {
+                    RightNeighbour = startCell.MyNeighbours[_directionRight];
+                }
+                
+            if (LeftNeighbour != null)
+            {
+                if (!IsFreeCell(LeftNeighbour, out CheckerView checkerView))
+                {
+                    if (checkerView.ECheckerType == ECheckerType.Black)
+                    {
+                        Debug.Log("Is enemy on left top neighbour");
+                        if (IsFreeCell(LeftNeighbour.MyNeighbours[_directionLeft], out var pofig))
+                        {
+                            _isCanAttack = true;
+                        }
+                    }
+                }
+            }
+            
+            if (RightNeighbour != null)
+            {
+                if (!IsFreeCell(RightNeighbour, out CheckerView checkerView))
+                {
+                    if (checkerView.ECheckerType == ECheckerType.Black)
+                    {
+                        Debug.Log("Is enemy on left top neighbour");
+                        if (IsFreeCell(LeftNeighbour.MyNeighbours[ECellsNeighbours.LeftTop], out var pofig))
+                        {
+                            _isCanAttack = true;
+                        }
+                    }
+                }
+            }
+
+            if (RightNeighbour != null)
+            {
+                if (!IsFreeCell(RightNeighbour, out CheckerView checkerView))
+                {
+                    if (checkerView.ECheckerType == ECheckerType.Black)
+                    {
+                        Debug.Log("Is enemy on right top neighbour");
+                    }
                 }
             }
         }
@@ -147,22 +224,22 @@ namespace DefaultNamespace
 
                 if (IsEqualXZ(positionData.RightTopNeighbor, x, z))
                 {
-                    cellView.MyNeighbours.Add(CellsNeighbours.RightTop, cell);
+                    cellView.MyNeighbours.Add(ECellsNeighbours.RightTop, cell);
                 }
-
+                
                 if (IsEqualXZ(positionData.LeftTopNeighbor, x, z))
                 {
-                    cellView.MyNeighbours.Add(CellsNeighbours.LeftTop, cell);
+                    cellView.MyNeighbours.Add(ECellsNeighbours.LeftTop, cell);
                 }
 
                 if (IsEqualXZ(positionData.RightBotNeighbor, x, z))
                 {
-                    cellView.MyNeighbours.Add(CellsNeighbours.RightBot, cell);
+                    cellView.MyNeighbours.Add(ECellsNeighbours.RightBot, cell);
                 }
 
                 if (IsEqualXZ(positionData.LeftBotNeighbor, x, z))
                 {
-                    cellView.MyNeighbours.Add(CellsNeighbours.LeftBot, cell);
+                    cellView.MyNeighbours.Add(ECellsNeighbours.LeftBot, cell);
                 }
             }
         }
