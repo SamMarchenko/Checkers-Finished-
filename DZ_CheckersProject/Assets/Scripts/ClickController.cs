@@ -12,17 +12,23 @@ namespace DefaultNamespace
         [SerializeField] private CheckerView[] _checkerViews;
         [SerializeField] private List<CellView> _cellNeighbors;
 
-        [SerializeField] private Transform startMovePosition;
-        [SerializeField] private Transform endMovePosition;
-        [SerializeField] private bool wantMove;
+        [SerializeField] private Transform _startMovePosition;
+        [SerializeField] private Transform _endMovePosition;
+        [SerializeField] private bool _wantMove;
+
+        [SerializeField]
+        private Dictionary<CellsNeighbours, CellView> CellsAndNeighbours = new Dictionary<CellsNeighbours, CellView>();
+
+        [SerializeField] private Dictionary<CheckerView, CellView> _pairCheckerCell;
 
 
         private void Start()
         {
+            FindAllNeighbours();
             foreach (var cell in _cellViews)
             {
-                //cell.OnCellClick += GetNeighbors;
-                cell.OnCellClick += CanMove;
+                cell.OnCellClick += PrintDictionary;
+                cell.OnCellClick += FindMovingСoordinates;
             }
 
             foreach (var checker in _checkerViews)
@@ -31,7 +37,8 @@ namespace DefaultNamespace
             }
         }
 
-        private void GetNeighbors(CellView cellView)
+        //todo: пока не актуален
+        private void GetNeighborsOld(CellView cellView)
         {
             _cellNeighbors.Clear();
             Debug.Log($"Clicked cell = {cellView.name}");
@@ -76,31 +83,32 @@ namespace DefaultNamespace
             }
         }
 
-        private void CanMove(CellView cellView)
+        private void FindMovingСoordinates(CellView cellView)
         {
-            
-            if (!wantMove)
+            if (!_wantMove)
             {
-                startMovePosition = null;
-                endMovePosition = null;
+                _startMovePosition = null;
+                _endMovePosition = null;
                 return;
             }
-            wantMove = false;
+
+            _wantMove = false;
             foreach (var cell in _cellNeighbors)
             {
                 if (cellView == cell)
                 {
-                    endMovePosition = cell.transform;
+                    _endMovePosition = cell.transform;
+
                     return;
                 }
             }
 
-            startMovePosition = null;
+            _startMovePosition = null;
         }
 
         private void OnChecker(CheckerView checkerView)
         {
-            wantMove = true;
+            _wantMove = true;
             Debug.Log("Test");
             var xChecker = (int) checkerView.transform.position.x;
             var zChecker = (int) checkerView.transform.position.z;
@@ -112,12 +120,119 @@ namespace DefaultNamespace
 
                 if (xChecker == xCell && zChecker == zCell)
                 {
-                    startMovePosition = cell.transform;
-                    endMovePosition = null;
+                    _startMovePosition = cell.transform;
+                    _endMovePosition = null;
                     Debug.Log("In if");
-                    GetNeighbors(cell);
                 }
             }
+        }
+
+        private void FindAllNeighbours()
+        {
+            foreach (var cell in _cellViews)
+            {
+                cell.transform.position = new Vector3(cell.transform.position.x, 0f, cell.transform.position.z);
+                GetNeighborsForCurrentCell(cell);
+            }
+        }
+
+        private void GetNeighborsForCurrentCell(CellView cellView)
+        {
+            var positionData = GetNeighboursPositionData(cellView.transform.position);
+
+
+            foreach (var cell in _cellViews)
+            {
+                var (x, z) = GetPositionToInt(cell.transform.position);
+
+                if (IsEqualXZ(positionData.RightTopNeighbor, x, z))
+                {
+                    cellView.MyNeighbours.Add(CellsNeighbours.RightTop, cell);
+                }
+
+                if (IsEqualXZ(positionData.LeftTopNeighbor, x, z))
+                {
+                    cellView.MyNeighbours.Add(CellsNeighbours.LeftTop, cell);
+                }
+
+                if (IsEqualXZ(positionData.RightBotNeighbor, x, z))
+                {
+                    cellView.MyNeighbours.Add(CellsNeighbours.RightBot, cell);
+                }
+
+                if (IsEqualXZ(positionData.LeftBotNeighbor, x, z))
+                {
+                    cellView.MyNeighbours.Add(CellsNeighbours.LeftBot, cell);
+                }
+            }
+        }
+
+        private bool IsEqualXZ(IntPoint point, int x, int z)
+        {
+            return (x == point.X && z == point.Z);
+        }
+
+        private void PrintDictionary(CellView cellView)
+        {
+            cellView.PrintDictionary();
+        }
+
+        private CellPositionsData GetNeighboursPositionData(Vector3 cellViewPos)
+        {
+            var rightTopNeighbor = cellViewPos;
+            var leftTopNeighbor = cellViewPos;
+            var rightBotNeighbor = cellViewPos;
+            var leftBotNeighbor = cellViewPos;
+
+            rightTopNeighbor += new Vector3(10f, 0, 10f);
+            var (xRTCell, zRTCell) = GetPositionToInt(rightTopNeighbor);
+
+            leftTopNeighbor += new Vector3(-10f, 0, 10f);
+            var (xLTCell, zLTCell) = GetPositionToInt(leftTopNeighbor);
+
+            rightBotNeighbor += new Vector3(10f, 0, -10f);
+            var (xRBCell, zRBCell) = GetPositionToInt(rightBotNeighbor);
+
+            leftBotNeighbor += new Vector3(-10f, 0, -10f);
+            var (xLBCell, zLBCell) = GetPositionToInt(leftBotNeighbor);
+
+            return new CellPositionsData(new IntPoint(xRTCell, zRTCell), new IntPoint(xLTCell, zLTCell),
+                new IntPoint(xRBCell, zRBCell), new IntPoint(xLBCell, zLBCell));
+        }
+
+        private (int, int) GetPositionToInt(Vector3 FloatPosition)
+        {
+            return ((int) FloatPosition.x, (int) FloatPosition.z);
+        }
+    }
+
+
+    public class CellPositionsData
+    {
+        public IntPoint RightTopNeighbor;
+        public IntPoint LeftTopNeighbor;
+        public IntPoint RightBotNeighbor;
+        public IntPoint LeftBotNeighbor;
+
+        public CellPositionsData(IntPoint rightTopNeighbor, IntPoint leftTopNeighbor, IntPoint rightBotNeighbor,
+            IntPoint leftBotNeighbor)
+        {
+            RightTopNeighbor = rightTopNeighbor;
+            LeftTopNeighbor = leftTopNeighbor;
+            RightBotNeighbor = rightBotNeighbor;
+            LeftBotNeighbor = leftBotNeighbor;
+        }
+    }
+
+    public class IntPoint
+    {
+        public int X;
+        public int Z;
+
+        public IntPoint(int x, int z)
+        {
+            X = x;
+            Z = z;
         }
     }
 }
