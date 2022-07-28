@@ -9,33 +9,52 @@ namespace DefaultNamespace
 {
     public class ClickController : MonoBehaviour
     {
-        private ECellsNeighbours _directionRight = ECellsNeighbours.RightTop;
-        private ECellsNeighbours _directionLeft = ECellsNeighbours.LeftTop;
+        private ECellsNeighbours _directionRightTop = ECellsNeighbours.RightTop;
+        private ECellsNeighbours _directionLeftTop = ECellsNeighbours.LeftTop;
+        private ECellsNeighbours _directionRightBot = ECellsNeighbours.RightBot;
+        private ECellsNeighbours _directionLeftBot = ECellsNeighbours.LeftBot;
 
         [SerializeField] private CellView[] _cellViews;
 
         [SerializeField] private CheckerView[] _checkerViews;
+        public CheckerView[] CheckerViews => _checkerViews;
         [SerializeField] private List<CheckerView> _checkersInAttackRange;
 
         [SerializeField] private Transform _startMovePosition;
         [SerializeField] private Transform _endMovePosition;
         [SerializeField] private bool _wantMove;
         [SerializeField] private bool _isCanAttack;
+        [SerializeField] private bool _isCanClick = true;
+        [SerializeField] private bool _isTeamWin;
+        public bool IsTeamWin
+        {
+            set {_isTeamWin = value;}
+        }
 
-        [SerializeField]
-        private Dictionary<ECellsNeighbours, CellView>
+        [SerializeField] private Dictionary<ECellsNeighbours, CellView>
             CellsAndNeighbours = new Dictionary<ECellsNeighbours, CellView>();
 
         [SerializeField] private Dictionary<CheckerView, CellView> _pairCheckerCell;
 
         [SerializeField] private CellView _startCell;
         [SerializeField] private CellView _finishedCell;
-        [SerializeField] private CellView LeftNeighbour;
-        [SerializeField] private CellView RightNeighbour;
+        [SerializeField] private CellView _leftNeighbour;
+        [SerializeField] private CellView _rightNeighbour;
         [SerializeField] private CheckerView _clickedChecker;
         [SerializeField] private CheckerView _attackedChecker;
         [SerializeField] private CellView _commonNeighbour;
+        [SerializeField] private ECheckerType _turnSide;
+        public ECheckerType TurnSide 
+        {
+            set {_turnSide = value ; }
+        }
         private Coroutine _moveRoutine;
+        
+        public delegate void ClickEventHandler(ECheckerType checkerType);
+
+        public event ClickEventHandler OnKillChecker;
+        public event ClickEventHandler OnChangeTurn;
+        public event ClickEventHandler OnWinnerCell;
 
 
         private void Start()
@@ -44,34 +63,36 @@ namespace DefaultNamespace
 
             foreach (var cell in _cellViews)
             {
-                cell.OnCellClick += PrintDictionary;
+                //cell.OnCellClick += PrintDictionary;
                 cell.OnCellClick += OnCellClick;
             }
 
             foreach (var checker in _checkerViews)
             {
-                checker.OnCheckerClick += OnChecker;
+                checker.OnCheckerClick += OnCheckerСlick;
             }
         }
 
         private void OnCellClick(CellView clickedCell)
         {
+            //todo: зависимость от стороны
             if (!_wantMove)
             {
                 _startMovePosition = null;
                 _endMovePosition = null;
                 _commonNeighbour = null;
+                _startCell = null;
+                _finishedCell = null;
                 return;
             }
 
             foreach (var clickedCellMyNeighbour in clickedCell.MyNeighbours)
             {
-                //todo: дергать метод валидная ли клетка для атаки
-
                 if (_startCell != clickedCellMyNeighbour.Value) continue;
                 if (!IsFreeCell(clickedCell, out var pofig)) break;
                 _endMovePosition = clickedCell.transform;
-                Move(_clickedChecker, _startCell, clickedCell);
+                _finishedCell = clickedCell;
+                Move(_clickedChecker, _startCell, _finishedCell);
                 return;
             }
 
@@ -83,28 +104,88 @@ namespace DefaultNamespace
                 {
                     if (checker == _checkersInAttackRange[i])
                     {
-                        checker.transform.position += new Vector3(100, 0, 100);
-                        _checkersInAttackRange.Remove(_checkersInAttackRange[i]);
+                        KillChecker(checker, i);
                         Move(_clickedChecker, _startCell, clickedCell);
-                        //todo: добавить лок тапов во время анимации перемещения
                     }
                 }
             }
+        }
+        
+        private void KillChecker(CheckerView checker, int index)
+        {
+            checker.transform.position += new Vector3(100, 0, 100);
+            _checkersInAttackRange.Remove(_checkersInAttackRange[index]);
+            OnKillChecker?.Invoke(checker.ECheckerType);
+        }
+
+        private bool IsFreeCell(CellView clickedCell, out CheckerView checkerView)
+        {
+            var (xCell, zCell) = GetPositionToInt(clickedCell.transform.position);
+            foreach (var checker in _checkerViews)
+            {
+                var (xChecker, zChecker) = GetPositionToInt(checker.transform.position);
+                if (xCell == xChecker && zCell == zChecker)
+                {
+                    //Debug.Log($"The cell {clickedCell.name} is occupied by checker {checker.name}");
+                    checkerView = checker;
+                    return false;
+                }
+            }
+
+            checkerView = null;
+            return true;
+        }
+
+        private (int, int) GetPositionToInt(Vector3 FloatPosition)
+        {
+            return ((int) FloatPosition.x, (int) FloatPosition.z);
+        }
+
+        private void Move(CheckerView checkerView, CellView startCell, CellView finishCell)
+        {
+            if (_isTeamWin)
+            {
+                return;
+            }
+            _isCanClick = false;
+            _moveRoutine = StartCoroutine(MoveRoutine(startCell.transform.position, finishCell.transform.position, 1f));
+            _wantMove = false;
+            SetNeighbourCells(finishCell);
+            if (_leftNeighbour == null && _rightNeighbour == null)
+            {
+                OnWinnerCell?.Invoke(checkerView.ECheckerType);
+            }
+            OnChangeTurn?.Invoke(checkerView.ECheckerType);
+        }
+
+        private IEnumerator MoveRoutine(Vector3 startPosition, Vector3 endPosition, float time)
+        {
+            var currentTime = 0f;
+            while (currentTime < time)
+            {
+                _clickedChecker.transform.position =
+                    Vector3.Lerp(startPosition, endPosition, 1 - (time - currentTime) / time);
+                currentTime += Time.deltaTime;
+                yield return null;
+            }
+
+            _clickedChecker.transform.position = endPosition;
+            _isCanClick = true;
         }
 
         private void isValideCellForAttack(CellView clickedCell)
         {
             FindCommonNeighbours(clickedCell);
-            GetNeighbourCells(clickedCell);
+            SetNeighbourCells(clickedCell);
         }
 
         private void FindCommonNeighbours(CellView clickedCell)
         {
-            if (_startCell.MyNeighbours.ContainsKey(ECellsNeighbours.RightTop) &&
-                clickedCell.MyNeighbours.ContainsKey(ECellsNeighbours.LeftBot))
+            if (_startCell.MyNeighbours.ContainsKey(_directionRightTop) &&
+                clickedCell.MyNeighbours.ContainsKey(_directionLeftBot))
             {
-                var _startCellRightTopNei = _startCell.MyNeighbours[ECellsNeighbours.RightTop];
-                var _clickedCellLeftBotNei = clickedCell.MyNeighbours[ECellsNeighbours.LeftBot];
+                var _startCellRightTopNei = _startCell.MyNeighbours[_directionRightTop];
+                var _clickedCellLeftBotNei = clickedCell.MyNeighbours[_directionLeftBot];
                 if (_startCellRightTopNei == _clickedCellLeftBotNei)
                 {
                     _commonNeighbour = _startCellRightTopNei;
@@ -112,11 +193,11 @@ namespace DefaultNamespace
                 }
             }
 
-            if (_startCell.MyNeighbours.ContainsKey(ECellsNeighbours.LeftTop) &&
-                clickedCell.MyNeighbours.ContainsKey(ECellsNeighbours.RightBot))
+            if (_startCell.MyNeighbours.ContainsKey(_directionLeftTop) &&
+                clickedCell.MyNeighbours.ContainsKey(_directionRightBot))
             {
-                var _startCellLeftTopNei = _startCell.MyNeighbours[ECellsNeighbours.LeftTop];
-                var _clickedCellRightBotNei = clickedCell.MyNeighbours[ECellsNeighbours.RightBot];
+                var _startCellLeftTopNei = _startCell.MyNeighbours[_directionLeftTop];
+                var _clickedCellRightBotNei = clickedCell.MyNeighbours[_directionRightBot];
                 if (_startCellLeftTopNei == _clickedCellRightBotNei)
                 {
                     _commonNeighbour = _startCellLeftTopNei;
@@ -129,45 +210,15 @@ namespace DefaultNamespace
             }
         }
 
-        private void Move(CheckerView checkerView, CellView startCell, CellView finishCell)
+
+        private void OnCheckerСlick(CheckerView checkerView)
         {
-            _moveRoutine = StartCoroutine(MoveRoutine(startCell.transform.position, finishCell.transform.position, 1f));
-            Debug.Log($"Moving {checkerView} from {startCell} to {finishCell}");
-            _wantMove = false;
-        }
-        private IEnumerator MoveRoutine(Vector3 startPosition, Vector3 endPosition, float time)
-        {
-            var currentTime = 0f;
-            while (currentTime < time)
+            if (_turnSide != checkerView.ECheckerType)
             {
-                _clickedChecker.transform.position = Vector3.Lerp(startPosition, endPosition, 1 - (time - currentTime) / time);
-                currentTime += Time.deltaTime;
-                yield return null;
-            }
-            _clickedChecker.transform.position = endPosition;
-        }
-
-        private bool IsFreeCell(CellView clickedCell, out CheckerView checkerView)
-        {
-            var (xCell, zCell) = GetPositionToInt(clickedCell.transform.position);
-            foreach (var checker in _checkerViews)
-            {
-                var (xChecker, zChecker) = GetPositionToInt(checker.transform.position);
-                if (xCell == xChecker && zCell == zChecker)
-                {
-                    Debug.Log($"The cell {clickedCell.name} is occupied by checker {checker.name}");
-                    checkerView = checker;
-                    return false;
-                }
-            }
-
-            checkerView = null;
-            return true;
-        }
-        
-
-        private void OnChecker(CheckerView checkerView)
-        {
+                Debug.Log($"Now is turn of another team: {_turnSide}");
+                return;
+            }   
+            if (!_isCanClick) return;
             _checkersInAttackRange.Clear();
             _wantMove = true;
             _clickedChecker = checkerView;
@@ -183,28 +234,35 @@ namespace DefaultNamespace
                 {
                     _startMovePosition = cell.transform;
                     _startCell = cell;
-                    GetNeighbourCells(_startCell);
-                    GetEnemieOnNeighbourCell(LeftNeighbour);
-                    GetEnemieOnNeighbourCell(RightNeighbour);
+                    SetNeighbourCells(_startCell);
+                    GetEnemieOnNeighbourCell(_leftNeighbour);
+                    GetEnemieOnNeighbourCell(_rightNeighbour);
                     _endMovePosition = null;
                 }
             }
         }
-
-        private void GetNeighbourCells(CellView startCell)
+        public void SetDirection(ECellsNeighbours leftTop, ECellsNeighbours rightTop, ECellsNeighbours leftBot, ECellsNeighbours rightBot)
         {
-            LeftNeighbour = null;
-            RightNeighbour = null;
+            _directionLeftTop = leftTop;
+            _directionRightTop = rightTop;
+            _directionLeftBot = leftBot;
+            _directionRightBot = rightBot;
+        }
+        private void SetNeighbourCells(CellView startCell)
+        {
+            _leftNeighbour = null;
+            _rightNeighbour = null;
 
-            if (startCell.MyNeighbours.ContainsKey(_directionLeft))
+            if (startCell.MyNeighbours.ContainsKey(_directionLeftTop))
             {
-                LeftNeighbour = startCell.MyNeighbours[_directionLeft];
+                _leftNeighbour = startCell.MyNeighbours[_directionLeftTop];
             }
 
-            if (startCell.MyNeighbours.ContainsKey(_directionRight))
+            if (startCell.MyNeighbours.ContainsKey(_directionRightTop))
             {
-                RightNeighbour = startCell.MyNeighbours[_directionRight];
+                _rightNeighbour = startCell.MyNeighbours[_directionRightTop];
             }
+            
         }
 
         private void GetEnemieOnNeighbourCell(CellView cell)
@@ -213,7 +271,7 @@ namespace DefaultNamespace
             {
                 if (!IsFreeCell(cell, out CheckerView checkerView))
                 {
-                    if (checkerView.ECheckerType == ECheckerType.Black)
+                    if (checkerView.ECheckerType != _clickedChecker.ECheckerType)
                     {
                         _checkersInAttackRange.Add(checkerView);
                     }
@@ -292,41 +350,6 @@ namespace DefaultNamespace
 
             return new CellPositionsData(new IntPoint(xRTCell, zRTCell), new IntPoint(xLTCell, zLTCell),
                 new IntPoint(xRBCell, zRBCell), new IntPoint(xLBCell, zLBCell));
-        }
-
-        private (int, int) GetPositionToInt(Vector3 FloatPosition)
-        {
-            return ((int) FloatPosition.x, (int) FloatPosition.z);
-        }
-    }
-
-
-    public class CellPositionsData
-    {
-        public IntPoint RightTopNeighbor;
-        public IntPoint LeftTopNeighbor;
-        public IntPoint RightBotNeighbor;
-        public IntPoint LeftBotNeighbor;
-
-        public CellPositionsData(IntPoint rightTopNeighbor, IntPoint leftTopNeighbor, IntPoint rightBotNeighbor,
-            IntPoint leftBotNeighbor)
-        {
-            RightTopNeighbor = rightTopNeighbor;
-            LeftTopNeighbor = leftTopNeighbor;
-            RightBotNeighbor = rightBotNeighbor;
-            LeftBotNeighbor = leftBotNeighbor;
-        }
-    }
-
-    public class IntPoint
-    {
-        public int X;
-        public int Z;
-
-        public IntPoint(int x, int z)
-        {
-            X = x;
-            Z = z;
         }
     }
 }
