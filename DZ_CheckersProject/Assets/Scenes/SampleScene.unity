@@ -255,14 +255,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 61173182}
-  m_LocalRotation: {x: 0.53729963, y: 0, z: 0, w: 0.8433915}
-  m_LocalPosition: {x: 0, y: 55, z: -55}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 50, z: -45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 963194228}
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 65, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &66518119
 GameObject:
   m_ObjectHideFlags: 0
@@ -1889,7 +1889,6 @@ MonoBehaviour:
   _startMovePosition: {fileID: 0}
   _endMovePosition: {fileID: 0}
   _wantMove: 0
-  _isCanAttack: 0
   _isCanClick: 1
   _isTeamWin: 0
   _startCell: {fileID: 0}
@@ -1897,7 +1896,6 @@ MonoBehaviour:
   _leftNeighbour: {fileID: 0}
   _rightNeighbour: {fileID: 0}
   _clickedChecker: {fileID: 0}
-  _attackedChecker: {fileID: 0}
   _commonNeighbour: {fileID: 0}
   _turnSide: 0
 --- !u!4 &343486471
@@ -2593,7 +2591,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 453484735}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.01, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 790612067}
@@ -5184,13 +5182,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.1, y: 17.2, z: -0.2}
+  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 61173183}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
 --- !u!114 &963194229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6769,7 +6767,7 @@ MonoBehaviour:
   _clickController: {fileID: 343486470}
   whiteCheckersCounter: 0
   blackCheckersCounter: 0
-  _camera: {fileID: 0}
+  _camera: {fileID: 61173182}
 --- !u!4 &1361492104
 Transform:
   m_ObjectHideFlags: 0
@@ -6778,7 +6776,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1361492102}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -18.483837, y: -6.1379395, z: 4.49279}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

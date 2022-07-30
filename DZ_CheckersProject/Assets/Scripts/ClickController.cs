@@ -23,11 +23,16 @@ namespace DefaultNamespace
         [SerializeField] private Transform _startMovePosition;
         [SerializeField] private Transform _endMovePosition;
         [SerializeField] private bool _wantMove;
-        [SerializeField] private bool _isCanAttack;
         [SerializeField] private bool _isCanClick = true;
+        public bool IsCanClick
+        {
+            get { return _isCanClick;}
+            set {_isCanClick = value;}
+        }
         [SerializeField] private bool _isTeamWin;
         public bool IsTeamWin
         {
+            get { return _isTeamWin;}
             set {_isTeamWin = value;}
         }
 
@@ -41,7 +46,6 @@ namespace DefaultNamespace
         [SerializeField] private CellView _leftNeighbour;
         [SerializeField] private CellView _rightNeighbour;
         [SerializeField] private CheckerView _clickedChecker;
-        [SerializeField] private CheckerView _attackedChecker;
         [SerializeField] private CellView _commonNeighbour;
         [SerializeField] private ECheckerType _turnSide;
         public ECheckerType TurnSide 
@@ -63,7 +67,6 @@ namespace DefaultNamespace
 
             foreach (var cell in _cellViews)
             {
-                //cell.OnCellClick += PrintDictionary;
                 cell.OnCellClick += OnCellClick;
             }
 
@@ -75,7 +78,6 @@ namespace DefaultNamespace
 
         private void OnCellClick(CellView clickedCell)
         {
-            //todo: зависимость от стороны
             if (!_wantMove)
             {
                 _startMovePosition = null;
@@ -126,7 +128,6 @@ namespace DefaultNamespace
                 var (xChecker, zChecker) = GetPositionToInt(checker.transform.position);
                 if (xCell == xChecker && zCell == zChecker)
                 {
-                    //Debug.Log($"The cell {clickedCell.name} is occupied by checker {checker.name}");
                     checkerView = checker;
                     return false;
                 }
@@ -170,7 +171,7 @@ namespace DefaultNamespace
             }
 
             _clickedChecker.transform.position = endPosition;
-            _isCanClick = true;
+            
         }
 
         private void isValideCellForAttack(CellView clickedCell)
