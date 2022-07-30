@@ -115,7 +115,7 @@ namespace DefaultNamespace
         
         private void KillChecker(CheckerView checker, int index)
         {
-            checker.transform.position += new Vector3(100, 0, 100);
+            checker.transform.position += new Vector3(1000, 0, 1000);
             _checkersInAttackRange.Remove(_checkersInAttackRange[index]);
             OnKillChecker?.Invoke(checker.ECheckerType);
         }

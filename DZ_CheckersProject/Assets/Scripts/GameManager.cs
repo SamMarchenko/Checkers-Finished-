@@ -67,6 +67,8 @@ namespace DefaultNamespace
                 blackCheckersCounter--;
                 if (blackCheckersCounter == 0)
                 {
+                    _clickController.IsCanClick = false;
+                    _clickController.IsTeamWin = true;
                     Debug.Log("White win!");
                 }
             }
@@ -75,6 +77,8 @@ namespace DefaultNamespace
                 whiteCheckersCounter--;
                 if (whiteCheckersCounter == 0)
                 {
+                    _clickController.IsCanClick = false;
+                    _clickController.IsTeamWin = true;
                     Debug.Log("Black win!");
                 }
             }
