@@ -163,7 +163,7 @@ namespace DefaultNamespace
         {
             //todo: тут костыль
             startPosition += new Vector3(0, 1, 0);
-            endPosition += new Vector3(0, 1, 0);;
+            endPosition += new Vector3(0, 1, 0);
             var currentTime = 0f;
             while (currentTime < time)
             {
