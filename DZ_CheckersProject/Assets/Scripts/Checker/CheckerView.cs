@@ -8,7 +8,10 @@ namespace Checker
     public class CheckerView : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private ECheckerType eCheckerType;
+        [SerializeField] private Material[] _materials;
+        public Material[] Materials => _materials;
         public ECheckerType ECheckerType => eCheckerType;
+        
         
         public delegate void ClickEventHandler(CheckerView component);
 

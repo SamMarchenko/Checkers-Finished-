@@ -174,6 +174,7 @@ namespace DefaultNamespace
             }
 
             _clickedChecker.transform.position = endPosition;
+            ChangeCheckerMaterial(_clickedChecker, 0);
             
         }
 
@@ -225,7 +226,12 @@ namespace DefaultNamespace
             if (!_isCanClick) return;
             _checkersInAttackRange.Clear();
             _wantMove = true;
+            if (_clickedChecker != null && _clickedChecker != checkerView)
+            {
+                ChangeCheckerMaterial(_clickedChecker,0);
+            }
             _clickedChecker = checkerView;
+            ChangeCheckerMaterial(_clickedChecker, 1);
             _commonNeighbour = null;
 
             var (xChecker, zChecker) = GetPositionToInt(checkerView.transform.position);
@@ -244,6 +250,12 @@ namespace DefaultNamespace
                     _endMovePosition = null;
                 }
             }
+        }
+
+        private void ChangeCheckerMaterial(CheckerView checker, int index)
+        {
+           var material = checker.GetComponent<MeshRenderer>();
+           material.material = _clickedChecker.Materials[index];
         }
         public void SetDirection(ECellsNeighbours leftTop, ECellsNeighbours rightTop, ECellsNeighbours leftBot, ECellsNeighbours rightBot)
         {
