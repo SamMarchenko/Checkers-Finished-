@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<module version="4">
-  <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$/../.." />
-    <content url="file://$MODULE_DIR$/../../../../../../../../Unity/Hub/Editor/2020.3.4f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.ugui/Editor" />
-    <content url="file://$MODULE_DIR$/../../../../../../../../Unity/Hub/Editor/2020.3.4f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.ugui/Runtime" />
-    <orderEntry type="sourceFolder" forTests="false" />
-  </component>
-</module>
