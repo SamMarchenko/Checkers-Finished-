@@ -19,11 +19,21 @@ namespace DefaultNamespace
 
         private void Start()
         {
+            CheckObserver();
             SetCameraTurnPositions(_camera.transform.position);
             FillCheckerCounters();
             _clickController.OnKillChecker += ClickControllerOnOnKillChecker;
             _clickController.OnChangeTurn += ClickControllerOnOnChangeTurn;
             _clickController.OnWinnerCell += ClickControllerOnOnWinnerCell;
+        }
+
+        private void CheckObserver()
+        {
+            var _observer = FindObjectOfType<ObserverManger>();
+            if (_observer.enabled && _observer.IsPlayMode)
+            {
+                // Лочить управление
+            }
         }
 
         private void SetCameraTurnPositions(Vector3 cameraStartPosition)
