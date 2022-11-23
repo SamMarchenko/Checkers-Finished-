@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace DefaultNamespace
 {
-    public class ObserverManger : MonoBehaviour
+    public class ObserverView : MonoBehaviour
     {
-        public bool IsPlayMode;
+        public bool IsReplayMode;
 
         private void Start()
         {

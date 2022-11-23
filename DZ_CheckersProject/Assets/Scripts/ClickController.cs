@@ -48,8 +48,9 @@ namespace DefaultNamespace
         [SerializeField] private CheckerView _clickedChecker;
         [SerializeField] private CellView _commonNeighbour;
         [SerializeField] private ECheckerType _turnSide;
-        public ECheckerType TurnSide 
+        public ECheckerType TurnSide
         {
+            get { return _turnSide;}
             set {_turnSide = value ; }
         }
         private Coroutine _moveRoutine;
@@ -59,6 +60,9 @@ namespace DefaultNamespace
         public event ClickEventHandler OnKillChecker;
         public event ClickEventHandler OnChangeTurn;
         public event ClickEventHandler OnWinnerCell;
+        public Action<CheckerView> ClickedCheckerForMove;
+        public Action<CheckerView> KillCheckerForObserver;
+        public Action<CellView> ClickedCellForMove;
 
 
         private void Start()
@@ -111,13 +115,18 @@ namespace DefaultNamespace
                     }
                 }
             }
+            
         }
         
         private void KillChecker(CheckerView checker, int index)
         {
             checker.transform.position += new Vector3(1000, 0, 1000);
             _checkersInAttackRange.Remove(_checkersInAttackRange[index]);
+            
             OnKillChecker?.Invoke(checker.ECheckerType);
+            
+            //todo: Использует наблюдатель
+            KillCheckerForObserver?.Invoke(checker);
         }
 
         private bool IsFreeCell(CellView clickedCell, out CheckerView checkerView)
@@ -157,6 +166,9 @@ namespace DefaultNamespace
                 OnWinnerCell?.Invoke(checkerView.ECheckerType);
             }
             OnChangeTurn?.Invoke(checkerView.ECheckerType);
+            
+            //todo: Для наблюдателя
+            ClickedCellForMove?.Invoke(finishCell);
         }
 
         private IEnumerator MoveRoutine(Vector3 startPosition, Vector3 endPosition, float time)
@@ -232,6 +244,10 @@ namespace DefaultNamespace
             }
             _clickedChecker = checkerView;
             ChangeCheckerMaterial(_clickedChecker, 1);
+            
+           
+            
+            
             _commonNeighbour = null;
 
             var (xChecker, zChecker) = GetPositionToInt(checkerView.transform.position);
@@ -250,6 +266,8 @@ namespace DefaultNamespace
                     _endMovePosition = null;
                 }
             }
+            //todo: Для наблюдателя
+            ClickedCheckerForMove?.Invoke(checkerView);
         }
 
         private void ChangeCheckerMaterial(CheckerView checker, int index)

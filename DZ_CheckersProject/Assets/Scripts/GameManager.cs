@@ -13,41 +13,49 @@ namespace DefaultNamespace
         [SerializeField] private int whiteCheckersCounter;
         [SerializeField] private int blackCheckersCounter;
         [SerializeField] private GameObject _camera;
+        [SerializeField] private ObserverView _observerView;
         private Vector3 _whiteTurnCameraPos;
         private Vector3 _blackTurnCameraPos;
+        private IObserverManager _observerManager;
+
+        public Action EndMoveForObserver;
 
 
         private void Start()
         {
-            CheckObserver();
+            _observerManager = new ObserverManager(_observerView, this, _clickController);
+            _observerManager.Subscribe();
+            
             SetCameraTurnPositions(_camera.transform.position);
             FillCheckerCounters();
-            _clickController.OnKillChecker += ClickControllerOnOnKillChecker;
-            _clickController.OnChangeTurn += ClickControllerOnOnChangeTurn;
-            _clickController.OnWinnerCell += ClickControllerOnOnWinnerCell;
+            Subscribe();
         }
 
-        private void CheckObserver()
+        private void Subscribe()
         {
-            var _observer = FindObjectOfType<ObserverManger>();
-            if (_observer.enabled && _observer.IsPlayMode)
-            {
-                // Лочить управление
-            }
+            _clickController.OnKillChecker += ClickControllerOnKillChecker;
+            _clickController.OnChangeTurn += ClickControllerOnChangeTurn;
+            _clickController.OnWinnerCell += ClickControllerOnWinnerCell;
         }
-
+        private void Unsubscribe()
+        {
+            _clickController.OnKillChecker -= ClickControllerOnKillChecker;
+            _clickController.OnChangeTurn -= ClickControllerOnChangeTurn;
+            _clickController.OnWinnerCell -= ClickControllerOnWinnerCell;
+        }
+        
         private void SetCameraTurnPositions(Vector3 cameraStartPosition)
         {
             _whiteTurnCameraPos = cameraStartPosition;
             _blackTurnCameraPos = new Vector3(_whiteTurnCameraPos.x, _whiteTurnCameraPos.y, -1f *_whiteTurnCameraPos.z);
         }
-        private void ClickControllerOnOnWinnerCell(ECheckerType checkertype)
+        private void ClickControllerOnWinnerCell(ECheckerType checkertype)
         {
             _clickController.IsTeamWin = true;
             Debug.Log($"{checkertype} WIN!!!");
         }
 
-        private void ClickControllerOnOnChangeTurn(ECheckerType checkertype)
+        private void ClickControllerOnChangeTurn(ECheckerType checkertype)
         {
             if (checkertype == ECheckerType.Black)
             {
@@ -67,10 +75,9 @@ namespace DefaultNamespace
                     MoveCamera(_whiteTurnCameraPos, _blackTurnCameraPos);
                 }
             }
-            
         }
 
-        private void ClickControllerOnOnKillChecker(ECheckerType checkertype)
+        private void ClickControllerOnKillChecker(ECheckerType checkertype)
         {
             if (checkertype == ECheckerType.Black)
             {
@@ -128,6 +135,15 @@ namespace DefaultNamespace
             _camera.transform.position = finishPosition;
             _camera.transform.Rotate(0,180f,0, Space.World);
            _clickController.IsCanClick = true;
+           
+           //todo: Для наблюдателя
+           EndMoveForObserver?.Invoke();
+        }
+
+        private void OnDisable()
+        {
+            Unsubscribe();
+            _observerManager.Unsubscribe();
         }
     }
 }
