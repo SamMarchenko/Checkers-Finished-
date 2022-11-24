@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine.EventSystems;
 
 namespace Checker
 {
+    [Serializable]
     public class CheckerView : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private ECheckerType eCheckerType;

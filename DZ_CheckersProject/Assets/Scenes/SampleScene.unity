@@ -6844,7 +6844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ce30a1026984864d91de6b5d3e27fcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsReplayMode: 0
+  IsReplayMode: 1
 --- !u!1 &1397929794
 GameObject:
   m_ObjectHideFlags: 0

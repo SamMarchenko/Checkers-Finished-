@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace DefaultNamespace
 {
+    
     public class ClickController : MonoBehaviour
     {
         private ECellsNeighbours _directionRightTop = ECellsNeighbours.RightTop;
@@ -15,8 +16,10 @@ namespace DefaultNamespace
         private ECellsNeighbours _directionLeftBot = ECellsNeighbours.LeftBot;
 
         [SerializeField] private CellView[] _cellViews;
+        public CellView[] CellViews => _cellViews;
 
         [SerializeField] private CheckerView[] _checkerViews;
+        public CheckerView[] CheckerView => _checkerViews;
         public CheckerView[] CheckerViews => _checkerViews;
         [SerializeField] private List<CheckerView> _checkersInAttackRange;
 
@@ -80,7 +83,7 @@ namespace DefaultNamespace
             }
         }
 
-        private void OnCellClick(CellView clickedCell)
+        public void OnCellClick(CellView clickedCell)
         {
             if (!_wantMove)
             {
@@ -163,6 +166,7 @@ namespace DefaultNamespace
             SetNeighbourCells(finishCell);
             if (_leftNeighbour == null && _rightNeighbour == null)
             {
+               // ClickedCellForMove?.Invoke(finishCell);
                 OnWinnerCell?.Invoke(checkerView.ECheckerType);
             }
             OnChangeTurn?.Invoke(checkerView.ECheckerType);
@@ -228,11 +232,11 @@ namespace DefaultNamespace
         }
 
 
-        private void OnCheckerСlick(CheckerView checkerView)
+        public void OnCheckerСlick(CheckerView checkerView)
         {
             if (_turnSide != checkerView.ECheckerType)
             {
-                Debug.Log($"Now is turn of another team: {_turnSide}");
+                Debug.Log($"Now is turn of another team: {_turnSide}. Clicked by {checkerView.name}");
                 return;
             }   
             if (!_isCanClick) return;

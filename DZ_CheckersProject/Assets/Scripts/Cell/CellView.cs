@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Cell
 {
+    [Serializable]
     public class CellView : MonoBehaviour, IPointerClickHandler
     {
         public delegate void ClickEventHandler(CellView component);

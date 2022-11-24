@@ -23,12 +23,14 @@ namespace DefaultNamespace
 
         private void Start()
         {
+            SetCameraTurnPositions(_camera.transform.position);
+            Subscribe();
+            FillCheckerCounters();
+            
+            
             _observerManager = new ObserverManager(_observerView, this, _clickController);
             _observerManager.Subscribe();
-            
-            SetCameraTurnPositions(_camera.transform.position);
-            FillCheckerCounters();
-            Subscribe();
+            _observerManager.Start();
         }
 
         private void Subscribe()
@@ -123,7 +125,7 @@ namespace DefaultNamespace
 
         private IEnumerator MoveRoutine(Vector3 startPosition, Vector3 finishPosition, float time)
         {
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(1f);
             var currentTime = 0f;
             while (currentTime < time)
             {
@@ -139,7 +141,8 @@ namespace DefaultNamespace
            //todo: Для наблюдателя
            EndMoveForObserver?.Invoke();
         }
-
+        
+        
         private void OnDisable()
         {
             Unsubscribe();
