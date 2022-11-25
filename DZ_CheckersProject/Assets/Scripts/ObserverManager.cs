@@ -5,6 +5,7 @@ using Cell;
 using Checker;
 using Unity.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DefaultNamespace
 {
@@ -14,6 +15,7 @@ namespace DefaultNamespace
         private readonly ObserverView _observerView;
         private readonly GameManager _gameManager;
         private readonly ClickController _clickController;
+        private readonly Image _inputBlocker;
         private readonly MovingDataList _movingDataList = new MovingDataList();
         private MovingData _movingData;
 
@@ -21,20 +23,26 @@ namespace DefaultNamespace
 
         public bool isReplayModeOn => _observerView.IsReplayMode;
 
-        public ObserverManager(ObserverView observerView, GameManager gameManager, ClickController clickController)
+        public ObserverManager(ObserverView observerView, GameManager gameManager, ClickController clickController, Image inputBlocker)
         {
             _observerView = observerView;
             _gameManager = gameManager;
             _clickController = clickController;
+            _inputBlocker = inputBlocker;
         }
 
         public void Start()
         {
             if (isReplayModeOn)
             {
+                _inputBlocker.enabled = true;
                 Debug.Log("REPLAY mode ON!!!");
                 ReadFromJson();
                 ReplayGame();
+            }
+            else
+            {
+                _inputBlocker.enabled = false;
             }
         }
 
@@ -115,12 +123,12 @@ namespace DefaultNamespace
             string moveToJson = JsonHelper.ToJson(_movingDataList.DatasListForJSON.ToArray(), true);
             
             Debug.Log(moveToJson);
-            File.WriteAllText(Application.streamingAssetsPath + "/TestJSON.json", moveToJson);
+            File.WriteAllText(Application.streamingAssetsPath + "/ReplayMovesJSON.json", moveToJson);
         }
 
         public void ReadFromJson()
         {
-           var data = File.ReadAllText(Application.streamingAssetsPath + "/TestJSON.json");
+           var data = File.ReadAllText(Application.streamingAssetsPath + "/ReplayMovesJSON.json");
             DataForJson[] datasFromJson = JsonHelper.FromJson<DataForJson>(data);
             
             _movingDataList.DatasList.Clear();
@@ -158,7 +166,7 @@ namespace DefaultNamespace
         {
             foreach (var element in array)
             {
-                Debug.Log($" jsonName {name}; elementName {element.name}");
+                //Debug.Log($" jsonName {name}; elementName {element.name}");
                 if (element.name.Contains(name))
                 {
                     return element;

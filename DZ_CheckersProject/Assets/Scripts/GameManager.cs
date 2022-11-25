@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cell;
 using Checker;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DefaultNamespace
 {
@@ -14,6 +15,7 @@ namespace DefaultNamespace
         [SerializeField] private int blackCheckersCounter;
         [SerializeField] private GameObject _camera;
         [SerializeField] private ObserverView _observerView;
+        [SerializeField] private Image _inputBlockerImage;
         private Vector3 _whiteTurnCameraPos;
         private Vector3 _blackTurnCameraPos;
         private IObserverManager _observerManager;
@@ -28,7 +30,7 @@ namespace DefaultNamespace
             FillCheckerCounters();
             
             
-            _observerManager = new ObserverManager(_observerView, this, _clickController);
+            _observerManager = new ObserverManager(_observerView, this, _clickController, _inputBlockerImage);
             _observerManager.Subscribe();
             _observerManager.Start();
         }

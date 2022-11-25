@@ -1,0 +1,34 @@
+{
+    "Items": [
+        {
+            "TurnName": "White",
+            "MovingCheckerName": "Ch_A3",
+            "KillingCheckerName": "",
+            "MovingCellName": "B4"
+        },
+        {
+            "TurnName": "Black",
+            "MovingCheckerName": "Ch_H6",
+            "KillingCheckerName": "",
+            "MovingCellName": "G5"
+        },
+        {
+            "TurnName": "White",
+            "MovingCheckerName": "Ch_A3",
+            "KillingCheckerName": "",
+            "MovingCellName": "C5"
+        },
+        {
+            "TurnName": "Black",
+            "MovingCheckerName": "Ch_B6",
+            "KillingCheckerName": "Ch_A3",
+            "MovingCellName": "D4"
+        },
+        {
+            "TurnName": "White",
+            "MovingCheckerName": "Ch_C3",
+            "KillingCheckerName": "Ch_B6",
+            "MovingCellName": "E5"
+        }
+    ]
+}
